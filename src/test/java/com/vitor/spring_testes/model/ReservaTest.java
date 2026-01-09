@@ -3,18 +3,43 @@ package com.vitor.spring_testes.model;
 import static org.assertj.core.api.Assertions.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ReservaTest {
 
-    @Test
-    void sucessoAoRealizarReserva(){
+    Carro carro;
+    Cliente cliente;
 
-        Carro carro = new Carro("City", 100);
-        Cliente cliente = new Cliente("Vitor");
+    @BeforeEach
+    void setUp() {
+        carro = new Carro("CITY", 100.0);
+        cliente = new Cliente("Vitor");
+    }
+
+    @Test
+    void sucessoAoCriarReserva(){
+
         int quantidadeDias = 5;
 
+
         Reserva reserva = new Reserva(carro,cliente,quantidadeDias);
+
+        assertThat(reserva).isNotNull();
+
+    }
+
+
+
+
+    @Test
+    void sucessoAoRealizarReserva() {
+
+        int quantidadeDias = 5;
+
+        Reserva reserva = new Reserva(carro, cliente, quantidadeDias);
 
         double valor = reserva.valorDaReserva();
 
@@ -22,18 +47,15 @@ class ReservaTest {
     }
 
     @Test
-    void deveLancarReservaInvalidaException(){
+    void deveLancarReservaInvalidaException() {
 
-        Carro carro = new Carro("City", 100);
-        Cliente cliente = new Cliente("Vitor");
-        int quantidadeDias = 0;
+        assertThrows(ReservaInvalidaException.class, () -> new Reserva(carro, cliente, 0));
+        assertDoesNotThrow(() -> new Reserva(carro,cliente,1));
 
-        Reserva reserva = new Reserva(carro,cliente,quantidadeDias);
+       var erro = catchThrowable(() -> new Reserva(carro, cliente, 0));
 
-
-        assertThrows(ReservaInvalidaException.class, () -> reserva.valorDaReserva());
+       assertThat(erro).isInstanceOf(ReservaInvalidaException.class).hasMessage("Reserva invalida");
     }
-
 
 
 }
