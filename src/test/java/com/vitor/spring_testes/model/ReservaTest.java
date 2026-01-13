@@ -20,18 +20,16 @@ class ReservaTest {
     }
 
     @Test
-    void sucessoAoCriarReserva(){
+    void sucessoAoCriarReserva() {
 
         int quantidadeDias = 5;
 
 
-        Reserva reserva = new Reserva(carro,cliente,quantidadeDias);
+        Reserva reserva = new Reserva(carro, cliente, quantidadeDias);
 
         assertThat(reserva).isNotNull();
 
     }
-
-
 
 
     @Test
@@ -50,11 +48,11 @@ class ReservaTest {
     void deveLancarReservaInvalidaException() {
 
         assertThrows(ReservaInvalidaException.class, () -> new Reserva(carro, cliente, 0));
-        assertDoesNotThrow(() -> new Reserva(carro,cliente,1));
+        assertDoesNotThrow(() -> new Reserva(carro, cliente, 1));
 
-       var erro = catchThrowable(() -> new Reserva(carro, cliente, 0));
+        var erro = catchThrowable(() -> new Reserva(carro, cliente, 0));
 
-       assertThat(erro).isInstanceOf(ReservaInvalidaException.class).hasMessage("Reserva invalida");
+        assertThat(erro).isInstanceOf(ReservaInvalidaException.class).hasMessage("Reserva invalida");
     }
 
 
