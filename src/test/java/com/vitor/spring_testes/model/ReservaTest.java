@@ -1,12 +1,12 @@
 package com.vitor.spring_testes.model;
 
-import static org.assertj.core.api.Assertions.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ReservaTest {
 
