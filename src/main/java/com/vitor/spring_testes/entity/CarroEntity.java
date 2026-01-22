@@ -14,13 +14,16 @@ public class CarroEntity {
 
     private Double preco;
 
+    private int ano;
 
-    public CarroEntity() {
-    }
 
-    public CarroEntity(String nome, Double preco) {
+    public CarroEntity(String nome, Double preco, int ano) {
         this.nome = nome;
         this.preco = preco;
+        this.ano = ano;
+    }
+
+    public CarroEntity() {
     }
 
     public String getNome() {
@@ -45,5 +48,13 @@ public class CarroEntity {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public int getAno() {
+        return ano;
+    }
+
+    public void setAno(int ano) {
+        this.ano = ano;
     }
 }

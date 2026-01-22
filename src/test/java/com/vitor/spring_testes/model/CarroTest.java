@@ -10,7 +10,7 @@ class CarroTest {
     @DisplayName("Sucesso ao calcular valor do aluguel")
     void deveCalcularValorAluguel(){
 
-        Carro carro = new Carro("Honda City", 100.0);
+        Carro carro = new Carro("Honda City", 100.0,2000);
         int quantidadeDias = 3;
 
         double valorCobrado = carro.valorAluguel(quantidadeDias);
@@ -22,7 +22,7 @@ class CarroTest {
     @DisplayName("Sucesso ao calcular valor do aluguel com desconto")
     void deveCalcularValorAluguelComDesconto(){
 
-        Carro carro = new Carro("Honda City", 100.0);
+        Carro carro = new Carro("Honda City", 100.0, 2020);
         int quantidadeDias = 5;
 
         double valorCobrado = carro.valorAluguel(quantidadeDias);

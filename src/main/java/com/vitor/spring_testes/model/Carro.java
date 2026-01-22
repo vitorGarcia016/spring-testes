@@ -4,11 +4,13 @@ public class Carro {
 
     private String nome;
     private double valorDiario;
+    private int ano;
 
 
-    public Carro(String nome, double valorDiario) {
+    public Carro(String nome, double valorDiario, int ano) {
         this.nome = nome;
         this.valorDiario = valorDiario;
+        this.ano = ano;
     }
 
     public String getNome() {

@@ -15,7 +15,7 @@ class ReservaTest {
 
     @BeforeEach
     void setUp() {
-        carro = new Carro("CITY", 100.0);
+        carro = new Carro("CITY", 100.0,2025);
         cliente = new Cliente("Vitor");
     }
 
