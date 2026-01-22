@@ -31,7 +31,9 @@ public class CarroService {
         carroExistente.setAno(carroAtualizado.getAno());
         carroExistente.setPreco(carroAtualizado.getPreco());
 
-        return carroRepository.save(carroExistente);
+        carroRepository.save(carroExistente);
+
+        return carroExistente;
 
     }
 
