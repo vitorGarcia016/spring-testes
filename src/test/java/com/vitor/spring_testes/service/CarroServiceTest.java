@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -94,6 +95,68 @@ class CarroServiceTest {
         assertThat(erro).hasMessage("Carro não encontrado").isInstanceOf(EntityNotFoundException.class);
         verify(carroRepository, never()).save(any());
 
+
+    }
+
+    @Test
+    @DisplayName("Sucesso ao deletar um carro")
+    void sucessoAodeletarUmcarro(){
+
+        Integer idCarro = 1;
+
+        when(carroRepository.findById(any())).thenReturn(Optional.of(carro));
+
+        carroService.deletarCarro(idCarro);
+
+        verify(carroRepository).delete(carro);
+
+    }
+
+    @Test
+    @DisplayName("Deve lançar uma exception ao tentar deletar um carro não existente")
+    void deveDaErroAoTentarDeletarUmCarroInexistente(){
+
+        Integer idCarro = 1;
+        when(carroRepository.findById(any())).thenReturn(Optional.empty());
+
+        var erro = catchThrowable(() -> carroService.deletarCarro(idCarro));
+
+        assertThat(erro).isInstanceOf(EntityNotFoundException.class).hasMessage("Carro não encontrado");
+        verify(carroRepository, never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("Sucesso ao buscar um carro por id")
+    void sucessoAoBuscarPorId(){
+
+        Integer idCarro = 1;
+
+        when(carroRepository.findById(idCarro)).thenReturn(Optional.of(carro));
+
+        CarroEntity respostaMetodo = carroService.buscarPorId(idCarro);
+
+        assertThat(respostaMetodo).isNotNull();
+        assertThat(respostaMetodo.getNome()).isEqualTo(carro.getNome());
+
+    }
+
+    @Test
+    void deveDaErroAoBuscarUmCarroInexistente(){
+        when(carroRepository.findById(any())).thenReturn(Optional.empty());
+
+        var erro = catchThrowable(() -> carroService.buscarPorId(any()));
+
+        assertThat(erro).isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void sucessoAoBuscarTodosOsCarros(){
+        when(carroRepository.findAll()).thenReturn(List.of(carro));
+
+        List<CarroEntity> respostaMetodo = carroService.carroEntities();
+
+        assertThat(respostaMetodo).isNotNull();
+        assertThat(respostaMetodo.get(0)).isInstanceOf(CarroEntity.class);
 
     }
 
