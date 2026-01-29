@@ -4,6 +4,7 @@ import com.vitor.spring_testes.entity.CarroEntity;
 import com.vitor.spring_testes.service.CarroService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import tools.jackson.databind.ObjectMapper;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -26,6 +28,9 @@ public class CarroControllerTest {
 
     @MockitoBean
     CarroService carroService;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     CarroEntity carro;
 
@@ -44,17 +49,12 @@ public class CarroControllerTest {
 
         when(carroService.salvarCarro(Mockito.any())).thenReturn(carroSalvo);
 
-        String json = """
-                {
-                    "nome": "Honda City",
-                    "preco": 100.0,
-                    "ano": 2025
-                }
-                """;
+        String json = objectMapper.writeValueAsString(carro);
+        String url = "/carro";
 
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/carro")
+                        .post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
 
@@ -64,6 +64,29 @@ public class CarroControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.header().exists("Location"))
                 .andExpect(MockMvcResultMatchers.header().string("Location", Matchers.endsWith("carro/" + carroSalvo.getId())));
+
+    }
+
+    @Test
+    @DisplayName("Deve Lancar Uma Exception Ao Salvar Um Carro Com Preco Menor Que Zero")
+    void deveLancarUmaExceptionAoSalvarUmCarroComPrecoMenorQueZero() throws Exception {
+
+        when(carroService.salvarCarro(any())).thenThrow(new IllegalArgumentException("Carro nao pode ter preco negativo"));
+
+
+        String json = objectMapper.writeValueAsString(carro);
+        String url = "/carro";
+
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        );
+
+        resultActions
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("Carro nao pode ter preco negativo"));
 
     }
 
