@@ -4,14 +4,12 @@ import com.vitor.spring_testes.entity.CarroEntity;
 import com.vitor.spring_testes.service.CarroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("carro")
@@ -35,5 +33,19 @@ public class CarroController {
 
         return ResponseEntity.created(uri).build();
 
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CarroEntity> buscarPorId(@PathVariable Integer id){
+        CarroEntity carroEntity = carroService.buscarPorId(id);
+
+        return ResponseEntity.ok().body(carroEntity);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CarroEntity>> buscarTodos(){
+        List<CarroEntity> carroEntities = carroService.carroEntities();
+
+        return ResponseEntity.ok().body(carroEntities);
     }
 }
