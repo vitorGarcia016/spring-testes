@@ -2,6 +2,7 @@ package com.vitor.spring_testes.controller;
 
 import com.vitor.spring_testes.entity.CarroEntity;
 import com.vitor.spring_testes.service.CarroService;
+import jakarta.persistence.EntityNotFoundException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,8 +18,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CarroController.class)
 public class CarroControllerTest {
@@ -53,17 +58,16 @@ public class CarroControllerTest {
         String url = "/carro";
 
         ResultActions result = mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post(url)
+                post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
 
         );
 
         result
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.header().exists("Location"))
-                .andExpect(MockMvcResultMatchers.header().string("Location", Matchers.endsWith("carro/" + carroSalvo.getId())));
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string("Location", Matchers.endsWith("carro/" + carroSalvo.getId())));
 
     }
 
@@ -78,15 +82,69 @@ public class CarroControllerTest {
         String url = "/carro";
 
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post(url)
+                post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
         );
 
         resultActions
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("Carro nao pode ter preco negativo"));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Carro nao pode ter preco negativo"));
+
+    }
+
+    @Test
+    @DisplayName("Sucesso ao tentar buscar por id um carro")
+    void sucessoAoBuscarCarroPorId() throws Exception{
+
+        Integer idCarro = 1;
+
+        CarroEntity carroSalvo = new CarroEntity(carro.getNome(), carro.getPreco(), carro.getAno());
+        carroSalvo.setId(idCarro);
+
+        when(carroService.buscarPorId(Mockito.any())).thenReturn(carroSalvo);
+
+        ResultActions resultActions = mockMvc.perform(get("/carro/1"));
+
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(carroSalvo.getId()))
+                .andExpect(jsonPath("$.nome").value(carroSalvo.getNome()))
+                .andExpect(jsonPath("$.preco").value(carroSalvo.getPreco()))
+                .andExpect(jsonPath("$.ano").value(carroSalvo.getAno()));
+    }
+
+    @Test
+    void deveLancarUmaExceptionAoTentarBuscarUmCarroInexistente() throws Exception {
+        when(carroService.buscarPorId(any())).thenThrow(new EntityNotFoundException("Carro não encontrado"));
+
+        ResultActions resultActions = mockMvc.perform(get("/carro/1"));
+
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Carro não encontrado"));
+    }
+
+
+    @Test
+    void sucessoAoBuscarTodosOsCarros() throws Exception {
+
+        List<CarroEntity> carros = List.of(
+                new CarroEntity("HB20",200.0,2010),
+                new CarroEntity("Fiat",100.0,1980)
+        );
+
+        when(carroService.carroEntities()).thenReturn(carros);
+
+        ResultActions resultActions = mockMvc.perform(
+                get("/carro")
+        );
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nome").value(carros.get(0).getNome()))
+                .andExpect(jsonPath("$[1].nome").value(carros.get(1).getNome()));
 
     }
 
