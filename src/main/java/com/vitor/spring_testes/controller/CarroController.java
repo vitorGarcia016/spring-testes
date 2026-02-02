@@ -2,6 +2,7 @@ package com.vitor.spring_testes.controller;
 
 import com.vitor.spring_testes.entity.CarroEntity;
 import com.vitor.spring_testes.service.CarroService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,5 +48,23 @@ public class CarroController {
         List<CarroEntity> carroEntities = carroService.carroEntities();
 
         return ResponseEntity.ok().body(carroEntities);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizar(@PathVariable Integer id, @RequestBody CarroEntity carro){
+
+        CarroEntity carroEntity = carroService.atualizarCarro(id, carro);
+
+        return ResponseEntity.noContent().build();
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Integer id){
+
+        carroService.deletarCarro(id);
+
+        return ResponseEntity.noContent().build();
+
     }
 }

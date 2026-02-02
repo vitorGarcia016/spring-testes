@@ -14,8 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -146,6 +144,71 @@ public class CarroControllerTest {
                 .andExpect(jsonPath("$[0].nome").value(carros.get(0).getNome()))
                 .andExpect(jsonPath("$[1].nome").value(carros.get(1).getNome()));
 
+    }
+
+    @Test
+    void sucessoAoAtualizarUmCarro() throws Exception{
+
+        CarroEntity carroDto = new CarroEntity("HB20", 40.0,2016);
+
+        when(carroService.atualizarCarro(any(), any())).thenReturn(carro);
+
+        ResultActions resultActions = mockMvc.perform(
+                put("/carro/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(carroDto))
+        );
+
+        resultActions
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveLancarUmExceptionAoAtualizarUmCarroInexistente() throws Exception {
+
+        CarroEntity carroDto = new CarroEntity("HB20", 40.0,2016);
+
+        String mensagemErro = "Carro não encontrado";
+
+        when(carroService.atualizarCarro(any(),any())).thenThrow(new EntityNotFoundException(mensagemErro));
+
+        ResultActions resultActions = mockMvc.perform(put("/carro/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(carroDto)));
+
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(mensagemErro));
+
+    }
+
+    @Test
+    void sucessoAoDeletar() throws Exception{
+
+        Mockito.doNothing().when(carroService).deletarCarro(any());
+
+        ResultActions resultActions = mockMvc.perform(
+                delete("/carro/1")
+        );
+
+        resultActions
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveDaErroAoDeletarCarro() throws Exception{
+
+        String mensagemErro = "Carro não encontrado";
+
+        Mockito.doThrow(new EntityNotFoundException(mensagemErro)).when(carroService).deletarCarro(any());
+
+        ResultActions resultActions = mockMvc.perform(
+                delete("/carro/1")
+        );
+
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(mensagemErro));
     }
 
 
